@@ -20,17 +20,39 @@ function validarNome(string $nome) {
     return $nomeClean;
 }
 
-function validarCPF($cpf) {
-    $cpf = preg_replace("/\D/", "", $cpf);
-    return strlen($cpf) === 11;
+function validarCPF(string $cpf) {
+    $cpfClean = preg_replace('/\D/', '', $cpf);
+
+    if (strlen($cpfClean) !== 11) responderJSON(false, 'O CPF deve conter 11 dígitos.', 400);
+
+    for ($t = 9; $t < 11; $t++) {
+        $soma = 0;
+        for ($c = 0; $c < $t; $c++) {
+            $soma += (int) $cpfClean[$c] * (($t + 1) - $c);
+        }
+
+        $digito = ((10 * $soma) % 11) % 10;
+
+        if ((int) $cpfClean[$t] !== $digito) {
+            responderJSON(false, 'CPF inválido.', 400);
+        }
+    }
+
+    return $cpfClean;    
 }
 
-function validarTelefone($telefone) {
-    $telefone = preg_replace("/\D/", "", $telefone);
-    return strlen($telefone) >= 10;
+function validarTelefone(string $telefone) {
+    $telClean = preg_replace("/\D/", "", $telefone);
+    
+    $tamanho = strlen($telClean);
+    if ($tamanho !== 10 && $tamanho !== 11) responderJSON(false, 'Telefone inválido. Informe DDD + número.', 400);
+
+    if (preg_match('/^(\d)\1+$/', $telClean)) responderJSON(false, 'Telefone inválido.', 400);
+
+    return $telClean;    
 }
 
-function validarEmail($email) {
+function validarEmail(string $email) {
     $emailClean = mb_strtolower(trim($email), 'UTF-8');
 
     if (strlen($emailClean) > 254) responderJSON(false, 'Tamanho do e-mail inválido.', 400);

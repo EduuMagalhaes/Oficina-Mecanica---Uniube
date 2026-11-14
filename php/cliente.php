@@ -1,39 +1,43 @@
 <?php
-require_once "functions.php";
+require_once __DIR__ . '/functions.php';
 
-$erros = [];
+validarCamposTexto($_POST, ['nome', 'cpf', 'telefone', 'email', 'endereco']);
 
-if (!isset($_POST["nome"]) || strlen($_POST["nome"]) < 3) {
-    $erros[] = "Informe um nome válido.";
-}
-if (!isset($_POST["cpf"]) || !validarCPF($_POST["cpf"])) {
-    $erros[] = "Informe um CPF válido.";
-}
-if (!isset($_POST["telefone"]) || !validarTelefone($_POST["telefone"])) {
-    $erros[] = "Informe um telefone válido.";
-}
-if (!isset($_POST["email"]) || !validarEmail($_POST["email"])) {
-    $erros[] = "Informe um e-mail válido.";
-}
-if (!isset($_POST["endereco"]) || strlen($_POST["endereco"]) < 5) {
-    $erros[] = "Informe um endereço válido.";
-}
+$nome = validarNome($_POST['nome']);
+$cpf = validarCPF($_POST['cpf']);
+$telefone = validarTelefone($_POST['telefone']);
+$email = validarEmail($_POST['email']);
+$endereco = trim($_POST['endereco']);
 
-if ($erros) {
-    responderJSON(false, implode(" ", $erros));
+try {
+    require __DIR__ . '/../db/conexao.php';
+
+    $consulta = $conexao->prepare(
+        'SELECT id FROM clientes WHERE cpf = ?'
+    );
+
+    $consulta->execute([$cpf]);
+
+    if ($consulta->fetch()) {
+        responderJSON(false, 'Já existe um cliente cadastrado com este CPF.', 409);
+    }
+
+    $cadastro = $conexao->prepare(
+        'INSERT INTO clientes (nome, cpf, telefone, email, endereco)
+         VALUES (?, ?, ?, ?, ?)'
+    );
+
+    $cadastro->execute([
+        $nome,
+        $cpf,
+        $telefone,
+        $email,
+        $endereco
+    ]);
+
+    responderJSON(true, 'Cliente cadastrado com sucesso.', 201);
+
+} catch (Throwable $erro) {
+    error_log($erro->getMessage());
+    responderJSON(false, 'Erro ao cadastrar o cliente.', 500);
 }
-
-$objetoCliente = [
-    "nome" => $_POST["nome"],
-    "cpf" => $_POST["cpf"],
-    "telefone" => $_POST["telefone"],
-    "email" => $_POST["email"],
-    "endereco" => $_POST["endereco"]
-];
-
-// Lógica extra - checar se já existe
-if (existeNoBanco("cliente", $objetoCliente)) {
-    responderJSON(false, "Já existe um cliente com este CPF ou e-mail.");
-}
-
-responderJSON(true, "Cliente cadastrado com sucesso.");
