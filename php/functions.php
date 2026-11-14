@@ -8,7 +8,7 @@ function validarNome(string $nome) {
     if ($nomeClean === '') responderJSON(false, 'Nome obrigatório.', 400);
 
     $tamanhoNome = mb_strlen($nomeClean, 'UTF-8');
-    if ($tamanhoNome > 100 || $tamanhoNome < 2) responderJSON(false, 'Tamanho do nome inválido.', 400);
+    if ($tamanhoNome > 150 || $tamanhoNome < 2) responderJSON(false, 'Tamanho do nome inválido.', 400);
    
     // - ^[\p{L}] : Começa obrigatoriamente com uma letra
     // - [\p{L}\s\'.-]* : Permite letras (com acentos), espaços, apóstrofos, pontos e hífens
