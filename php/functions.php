@@ -80,12 +80,45 @@ function validarPlaca($placa) {
     return preg_match($regex, $placa);
 }
 
-function validarDataNaoFutura($data) {
-    return $data <= date("Y-m-d");
+function validarDataNaoFutura(string $data) {
+    $dataClean = trim($data);
+    
+    date_default_timezone_set('America/Sao_Paulo');
+    
+    $objData = DateTimeImmutable::createFromFormat('Y-m-d', $dataClean);
+    $erros = DateTimeImmutable::getLastErrors();
+
+    if (
+        $objData === false ||
+        $objData->format('Y-m-d') !== $dataClean ||
+        ($erros !== false && ($erros['warning_count'] > 0 || $erros['error_count'] > 0))
+    ) {
+        responderJSON(false, 'Data inválida.', 400);
+    }
+
+    $hoje = new DateTimeImmutable('today');
+
+    if ($objData > $hoje) {
+        responderJSON(false, 'A data não pode ser futura.', 400);
+    }
+
+    return $dataClean;
 }
 
-function validarNumeroNaoNegativo($valor) {
-    return is_numeric($valor) && $valor >= 0;
+function validarNumeroNaoNegativo(string $valor) {    
+    $valorClean = trim($valor);
+    
+    if ($valorClean === '' || !preg_match('/^-?\d+(\.\d+)?$/', $valorClean)) {
+        responderJSON(false, "$campo deve ser um número válido.", 400);
+    }
+
+    $numero = (float) $valorClean;
+
+    if ($numero < 0) {
+        responderJSON(false, "$campo não pode ser negativo.", 400);
+    }
+
+    return $numero;
 }
 
 function validarAnoVeiculo($ano) {

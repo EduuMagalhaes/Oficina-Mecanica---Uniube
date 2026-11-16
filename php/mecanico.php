@@ -1,40 +1,43 @@
 <?php
-require_once "functions.php";
+require_once __DIR__ . '/functions.php';
 
-$erros = [];
+validarCamposTexto($_POST, ['nome', 'especialidade', 'telefone', 'data_admissao', 'valor_hora']);
 
-if (!isset($_POST["nome"]) || strlen($_POST["nome"]) < 3) {
-    $erros[] = "Informe um nome válido.";
-}
-if (!isset($_POST["especialidade"]) || strlen($_POST["especialidade"]) < 2) {
-    $erros[] = "Informe uma especialidade válida.";
-}
-if (!isset($_POST["telefone"]) || !validarTelefone($_POST["telefone"])) {
-    $erros[] = "Informe um telefone válido.";
-}
-if (!isset($_POST["admissao"]) || !validarDataNaoFutura($_POST["admissao"])) {
-    $erros[] = "Informe uma data de admissão válida.";
-}
-if (!isset($_POST["valor_hora"]) || !validarNumeroNaoNegativo($_POST["valor_hora"])) {
-    $erros[] = "informe um valor por hora válido.";
-}
+$nome = validarNome($_POST['nome']);
+$especialidade = trim($_POST['especialidade']);
+$telefone = validarTelefone($_POST['telefone']);
+$data_admissao = validarDataNaoFutura($_POST['data_admissao']);
+$valor_hora = validarNumeroNaoNegativo($_POST['valor_hora']);
 
-if ($erros) {
-    responderJSON(false, implode(" ", $erros));
+try {
+    require __DIR__ . '/../db/conexao.php';
+
+    $consulta = $conexao->prepare(
+        'SELECT id FROM mecanicos WHERE nome = ?'
+    );
+
+    $consulta->execute([$nome]);
+
+    if ($consulta->fetch()) {
+        responderJSON(false, 'Já existe um mecânico com este nome.', 409);
+    }
+    
+    $cadastro = $conexao->prepare(
+        'INSERT INTO mecanicos (nome, especialidade, telefone, data_admissao, valor_hora)
+         VALUES (?, ?, ?, ?, ?)'
+    );
+
+    $cadastro->execute([
+        $nome,
+        $especialidade,
+        $telefone,
+        $data_admissao,
+        $valor_hora
+    ]);
+
+    responderJSON(true, 'Mecânico cadastrado com sucesso.', 201);
+
+} catch (Throwable $erro) {
+    error_log($erro->getMessage());
+    responderJSON(false, 'Erro ao cadastrar o mecânico.', 500);
 }
-
-$objetoMecanico = [
-    "nome" => $_POST["nome"],
-    "especialidade" => $_POST["especialidade"],
-    "telefone" => $_POST["telefone"],
-    "admissao" => $_POST["admissao"],
-    "valor_hora" => $_POST["valor_hora"]
-];
-
-if (existeNoBanco("mecanico", $objetoMecanico)) {
-    responderJSON(false, "Já existe um mecânico com este nome.");
-}
-
-responderJSON(true, "Mecânico cadastrado com sucesso.");
-
-?>
