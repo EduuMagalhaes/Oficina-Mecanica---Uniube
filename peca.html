@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
     <script src="js/peca.js" defer></script>
+    <script src="js/api.js" defer></script>
     <title>Oficina Mecânica - Peças</title>
 </head>
 
@@ -21,27 +22,34 @@
             <li><a href="mecanico.html">Mecânicos</a></li>
             <li><a href="peca.html" class="ativo">Peças</a></li>
             <li><a href="os.html">Ordem de Serviço</a></li>
+            <li><a href="usuario.html">Usuários</a></li>
         </ul>
     </nav>
     <main>
         <h2>Cadastro de Peça</h2>
         <form id="form-peca">
             <label for="nome">Nome da peça:</label>
-            <input type="text" id="nome" name="nome" placeholder="Ex.: Pastilha de freio" required>
+            <input type="text" id="nome" name="nome" minlength="2" maxlength="150" placeholder="Ex.: Pastilha de freio" required>
+
             <label for="codigo">Código:</label>
             <input type="text" id="codigo" name="codigo" placeholder="Ex.: PF-2025" required>
+
             <label for="fornecedor">Fornecedor:</label>
-            <input type="text" id="fornecedor" name="fornecedor" minlength="2" placeholder="Ex.: AutoPeças LTDA"
+            <input type="text" id="fornecedor" name="fornecedor" minlength="2" maxlength="150" placeholder="Ex.: AutoPeças LTDA"
                 required>
+
             <label for="preco_custo">Preço de custo (R$):</label>
             <input type="number" id="preco_custo" name="preco_custo" min="0" step="0.01" placeholder="Ex.: 35.50"
                 required>
+
             <label for="preco_venda">Preço de venda (R$):</label>
             <input type="number" id="preco_venda" name="preco_venda" min="0" step="0.01" placeholder="Ex.: 65.00"
                 required>
-            <label for="estoque">Estoque:</label>
-            <input type="number" id="estoque" name="estoque" min="0" placeholder="Ex.: 20" required>
-            <button type="button" onclick="botaoCadastrarPeca()">Cadastrar</button>
+
+            <label for="qtd_estoque">Estoque:</label>
+            <input type="number" id="qtd_estoque" name="qtd_estoque" min="0" placeholder="Ex.: 20" required>
+
+            <button id="btn-peca" type="submit">Cadastrar</button>
         </form>
         <div id="mensagem"></div>
         <a class="voltar" href="index.html">Voltar à página inicial</a>

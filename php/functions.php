@@ -148,4 +148,20 @@ function validarCamposTexto(array $dados, array $campos) {
     }
 }
 
+function validarCodigo(string $codigo) {
+    $codigo = trim($codigo);
+
+    if ($codigo === '') responderJSON(false, "$codigo não informado.", 400);
+    
+    if(preg_match('/^[A-Za-z0-9]+$/', $codigo) !== 1) responderJSON(false, "$codigo deve conter apenas letras e números.", 400);
+
+    return $codigo;
+}
+
+function validarPrecoVenda(string $preco_venda, string $preco_custo) {
+    $valor = validarNumeroNaoNegativo($preco_venda);
+    if ($valor <= $preco_custo) responderJSON(false, "Valor de venda nao pode ser menor que valor de custo", 400);
+    return $valor;
+}
+
 ?>

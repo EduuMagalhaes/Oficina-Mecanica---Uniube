@@ -1,30 +1,19 @@
+const form = document.getElementById("form-peca");
 const msg = document.getElementById("mensagem");
+const botao = document.getElementById("btn-peca");
 
 function mostrarMensagem(texto, tipo) {
     msg.textContent = texto;
     msg.className = tipo;
 }
 
-async function botaoCadastrarPeca() {
-    const formulario = document.getElementById("form-peca");
-    const dados = new FormData(formulario);
+form.addEventListener("submit", (evento) => {
+    evento.preventDefault();    
 
-    try {
-        const resposta = await fetch("php/peca.php", {
-            method: "POST",
-            body: dados
-        });
-
-        const resultado = await resposta.json();
-
-        if (resultado.sucesso) {
-            mostrarMensagem(resultado.mensagem, "ok");
-            formulario.reset();
-        } else {
-            mostrarMensagem(resultado.mensagem, "erro");
-        }
-    } catch (erro) {
-        mostrarMensagem("Erro ao enviar os dados ao servidor.", "erro");
-        console.error(erro);
-    }
-}
+    enviarFormulario({
+        url: "php/peca.php",
+        form: form,
+        botao: botao,
+        mostrarMensagem: mostrarMensagem
+    });
+});
