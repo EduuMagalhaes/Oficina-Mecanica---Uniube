@@ -5,6 +5,14 @@ const buscarCliente = document.getElementById('buscar-cliente');
 const listaClientes = document.getElementById('lista-clientes');
 const clienteId = document.getElementById('cliente_id');
 const clienteNome = document.getElementById('cliente_nome');
+const form = document.getElementById("form-veiculo");
+const msg = document.getElementById("mensagem");
+const botao = document.getElementById("btn-veiculo");
+
+function mostrarMensagem(texto, tipo) {
+    msg.textContent = texto;
+    msg.className = tipo;
+}
 
 let clientes = [];
 
@@ -72,5 +80,18 @@ btnFecharModal.addEventListener('click', fecharModal);
 buscarCliente.addEventListener('input', () => {
     mostrarClientes(buscarCliente.value);
 });
+
+form.addEventListener("submit", (evento) => {
+    evento.preventDefault();
+
+    enviarFormulario({
+        url: "php/veiculo.php",
+        form: form,
+        botao: botao,
+        mostrarMensagem: mostrarMensagem
+    });
+});
+
+
 
 carregarClientes();

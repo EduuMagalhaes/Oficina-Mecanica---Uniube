@@ -9,10 +9,7 @@ function validarNome(string $nome) {
 
     $tamanhoNome = mb_strlen($nomeClean, 'UTF-8');
     if ($tamanhoNome > 150 || $tamanhoNome < 2) responderJSON(false, 'Tamanho do nome inválido.', 400);
-   
-    // - ^[\p{L}] : Começa obrigatoriamente com uma letra
-    // - [\p{L}\s\'.-]* : Permite letras (com acentos), espaços, apóstrofos, pontos e hífens
-    // - [\p{L}.]$ : Termina obrigatoriamente com uma letra ou ponto
+
     $regex = '/^[\p{L}][\p{L}\s\'.-]*[\p{L}.]$/u';
 
     if (!preg_match($regex, $nomeClean)) responderJSON(false, 'Nome inválido.', 400);
@@ -74,10 +71,17 @@ function validarSenha(string $senha) {
     return $senha;
 }
 
-function validarPlaca($placa) {
-    $placa = strtoupper(preg_replace("/[^A-Z0-9]/", "", $placa));
-    $regex = "/^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/";
-    return preg_match($regex, $placa);
+function validarPlaca(string $placa) {
+    $placaClean = strtoupper(trim($placa));
+
+    if ($placaClean === '') responderJSON(false, 'Placa obrigatória.', 400);
+
+    $mercossul = preg_match('/^[A-Z]{3}[0-9][A-Z][0-9]{2}$/', $placaClean) === 1;
+    $antiga = preg_match('/^[A-Z]{3}[0-9]{4}$/', $placaClean) === 1;
+
+    if (!$mercossul && !$antiga) responderJSON(false, 'Placa invalida. Use o formato ABC1234 ou ABC1D23.', 400);
+
+    return $placaClean;
 }
 
 function validarDataNaoFutura(string $data) {
@@ -121,11 +125,23 @@ function validarNumeroNaoNegativo(string $valor) {
     return $numero;
 }
 
-function validarAnoVeiculo($ano) {
-    return is_numeric($ano) && $ano >= 1950 && $ano <= date("Y") + 1;
+function validarAnoVeiculo(string $ano) {
+    $anoClean = trim($ano);
+
+    if ($anoClean === '') responderJSON(false, 'Ano do veículo não informado.', 400);
+
+    if (!preg_match('/^\d{4}$/', $anoClean)) responderJSON(false, 'Ano do veículo inválido.', 400);
+
+    $anoInt = (int) $anoClean;
+
+    if ($anoInt < 1950 || $anoInt > date('Y') + 1) {
+        responderJSON(false, 'Ano do veículo fora do intervalo permitido.', 400);
+    }
+
+    return $anoInt;
 }
 
-function responderJSON($sucesso, $mensagem, $status) {
+function responderJSON(bool $sucesso, string $mensagem, int $status) {
     http_response_code($status);
 
     echo json_encode([
@@ -162,6 +178,38 @@ function validarPrecoVenda(string $preco_venda, string $preco_custo) {
     $valor = validarNumeroNaoNegativo($preco_venda);
     if ($valor <= $preco_custo) responderJSON(false, "Valor de venda nao pode ser menor que valor de custo", 400);
     return $valor;
+}
+
+function validarMarcaModelo(string $marcaModelo) {
+    $marcaModeloClean = trim($marcaModelo);
+
+    if ($marcaModeloClean === '') responderJSON(false, 'Marca ou modelo não informada.', 400);    
+
+    if (!preg_match('/^[A-Za-zÀ-ÿ0-9][A-Za-zÀ-ÿ0-9\s\-\.&]*$/u', $marcaModeloClean)) {
+        responderJSON(false, 'A marca ou modelo contém caracteres inválidos.', 400);
+    }
+
+    return $marcaModeloClean;
+}
+
+function validarQuilometragem(string $quilometragem) {
+    $quilometragemClean = trim($quilometragem);
+
+    if ($quilometragemClean === '') responderJSON(false, 'Quilometragem não informada.', 400);
+
+    if (!preg_match('/^\d+$/', $quilometragemClean)) responderJSON(false, 'Quilometragem inválida.', 400);
+
+    return (int) $quilometragemClean;
+}
+
+function validarClienteId(string $clienteId) {
+    $clienteIdClean = trim($clienteId);
+
+    if ($clienteIdClean === '') responderJSON(false, 'ID do cliente não informado.', 400);
+
+    if (!preg_match('/^\d+$/', $clienteIdClean)) responderJSON(false, 'ID do cliente inválido.', 400);
+
+    return (int) $clienteIdClean;
 }
 
 ?>

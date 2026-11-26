@@ -1,44 +1,47 @@
 <?php
-require_once "functions.php";
+require_once __DIR__ . '/functions.php';
 
-$erros = [];
+validarCamposTexto($_POST, ['placa', 'marca', 'modelo', 'ano', 'quilometragem', 'cliente_id']);
 
-if (!isset($_POST["placa"]) || !validarPlaca($_POST["placa"])) {
-    $erros[] = "Informe uma placa válida.";
-}
-if (!isset($_POST["marca"]) || strlen($_POST["marca"]) < 2) {
-    $erros[] = "Informe uma marca válida.";
-}
-if (!isset($_POST["modelo"]) || strlen($_POST["modelo"]) < 2) {
-    $erros[] = "Informe um modelo válido.";
-}
-if (!isset($_POST["ano"]) || !validarAnoVeiculo($_POST["ano"])) {
-    $erros[] = "Informe um ano válido.";
-}
-if (!isset($_POST["quilometragem"]) || !validarNumeroNaoNegativo($_POST["quilometragem"])) {
-    $erros[] = "Informe uma quilometragem válida.";
-}
-if (!isset($_POST["cliente"]) || strlen($_POST["cliente"]) < 3) {
-    $erros[] = "Informe um cliente válido.";
-}
+$placa = validarPlaca($_POST['placa']);
+$marca = validarMarcaModelo($_POST['marca']);
+$modelo = validarMarcaModelo($_POST['modelo']);
+$ano = validarAnoVeiculo($_POST['ano']);
+$quilometragem = validarQuilometragem($_POST['quilometragem']);
+$clienteId = validarClienteId($_POST['cliente_id']);
 
-if ($erros) {
-    responderJSON(false, implode(" ", $erros));
+try {
+    require __DIR__ . '/../db/conexao.php';
+
+    $consulta = $conexao->prepare(
+        'SELECT id FROM veiculos WHERE placa = ?'
+    );
+
+    $consulta->execute([$placa]);
+
+    if ($consulta->fetch()) {
+        responderJSON(false, 'Já existe um veículo com esta placa.', 409);
+    }
+
+    $cadastro = $conexao->prepare(
+        'INSERT INTO veiculos (placa, marca, modelo, ano, quilometragem, cliente_id)
+         VALUES (?, ?, ?, ?, ?, ?)'
+    );
+
+    $cadastro->execute([
+        $placa,
+        $marca,
+        $modelo,
+        $ano,
+        $quilometragem,
+        $clienteId
+    ]);
+
+    responderJSON(true, 'Veículo cadastrado com sucesso.', 201);
+
+} catch (Throwable $erro) {
+    error_log($erro->getMessage());
+    responderJSON(false, 'Erro ao cadastrar o veículo.', 500);
 }
-
-$objetoVeiculo = [
-    "placa" => $_POST["placa"],
-    "marca" => $_POST["marca"],
-    "modelo" => $_POST["modelo"],
-    "ano" => $_POST["ano"],
-    "quilometragem" => $_POST["quilometragem"],
-    "cliente" => $_POST["cliente"]
-];
-
-if (existeNoBanco("veiculo", $objetoVeiculo)) {
-    responderJSON(false, "Já existe um veículo com esta placa.");
-}
-
-responderJSON(true, "Veículo cadastrado com sucesso.");
 
 ?>
