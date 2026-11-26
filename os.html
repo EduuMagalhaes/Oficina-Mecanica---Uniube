@@ -21,21 +21,40 @@
             <li><a href="mecanico.html">Mecânicos</a></li>
             <li><a href="peca.html">Peças</a></li>
             <li><a href="os.html" class="ativo">Ordem de Serviço</a></li>
+            <li><a href="usuario.html">Usuários</a></li>
         </ul>
     </nav>
     <main>
         <h2>Abertura de Ordem de Serviço</h2>
+
         <form id="form-os">
-            <label for="veiculo">Veículo (placa):</label>
-            <input type="text" id="veiculo" name="veiculo" placeholder="ABC1D23 ou ABC1234" maxlength="7" required>
-            <label for="mecanico">Mecânico responsável:</label>
-            <input type="text" id="mecanico" name="mecanico" placeholder="Nome do mecânico" required>
+            <label for="cliente_nome">Cliente:</label>
+            <div class="campo-cliente">
+                <input type="text" id="cliente_nome" placeholder="Nenhum cliente selecionado" readonly>
+                <button type="button" id="btn-selecionar-cliente">Selecionar</button>
+            </div>
+
+            <input type="hidden" id="cliente_id" name="cliente_id">
+
+            <label for="veiculo_nome">Veículo:</label>
+            <div class="campo-cliente">
+                <input type="text" id="veiculo_nome" placeholder="Nenhum veículo selecionado" readonly>
+                <button type="button" id="btn-selecionar-veiculo">Selecionar</button>
+            </div>
+
+            <input type="hidden" id="veiculo_id" name="veiculo_id">
+
+            <label for="mecanico_id">Mecânico responsável:</label>
+            <select id="mecanico_id" name="mecanico_id" required>
+                <option value="">Selecione um mecânico</option>
+            </select>
+
             <label for="entrada">Data de entrada:</label>
             <input type="date" id="entrada" name="entrada" required>
-            <label for="previsao">Previsão de entrega:</label>
-            <input type="date" id="previsao" name="previsao" required>
+
             <label for="defeito">Defeito relatado:</label>
             <textarea id="defeito" name="defeito" rows="4" placeholder="Descreva o problema" required></textarea>
+
             <label for="status">Status:</label>
             <select id="status" name="status" required>
                 <option value="Aberta" selected>Aberta</option>
@@ -43,10 +62,39 @@
                 <option value="Aguardando peça">Aguardando peça</option>
                 <option value="Concluída">Concluída</option>
             </select>
+
             <button type="button" onclick="botaoAbrirOS()">Abrir OS</button>
         </form>
+
         <div id="mensagem"></div>
+
         <a class="voltar" href="index.html">Voltar à página inicial</a>
+
+        <div id="modal-cliente" class="modal">
+            <div class="modal-conteudo">
+                <div class="modal-topo">
+                    <h3>Selecionar cliente</h3>
+                    <button type="button" id="btn-fechar-modal-cliente">&times;</button>
+                </div>
+
+                <input type="text" id="buscar-cliente" placeholder="Buscar pelo nome...">
+
+                <div id="lista-clientes"></div>
+            </div>
+        </div>
+
+        <div id="modal-veiculo" class="modal">
+            <div class="modal-conteudo">
+                <div class="modal-topo">
+                    <h3>Selecionar veículo</h3>
+                    <button type="button" id="btn-fechar-modal-veiculo">&times;</button>
+                </div>
+
+                <input type="text" id="buscar-veiculo" placeholder="Buscar pela placa...">
+
+                <div id="lista-veiculos"></div>
+            </div>
+        </div>
     </main>
 </body>
 

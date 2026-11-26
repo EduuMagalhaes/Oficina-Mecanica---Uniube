@@ -160,37 +160,41 @@ VALUES
     );
 
 INSERT INTO ordens_servico (
+    cliente_id,
     veiculo_id,
     mecanico_id,
+    defeito,
+    status,
     data_entrada,
-    data_previsao_entrega,
-    defeito_relatado,
-    status
+    data_abertura
 )
 VALUES
     (
+        @cliente_ana,
         @veiculo_ana,
         @mecanico_carlos,
-        '2026-11-14T08:00:00',
-        '2026-11-16T17:00:00',
         N'Motor falhando e dificuldade para dar partida.',
-        'aberta'
+        'Aberta',
+        '2026-11-14T08:00:00',
+        GETDATE()
     ),
     (
+        @cliente_pedro,
         @veiculo_pedro,
         @mecanico_juliana,
-        '2026-11-13T09:00:00',
-        '2026-11-17T17:00:00',
         N'Barulho nos freios ao reduzir a velocidade.',
-        'aguardando_peca'
+        'Aguardando peça',
+        '2026-11-13T09:00:00',
+        GETDATE()
     ),
     (
+        @cliente_mariana,
         @veiculo_mariana,
         @mecanico_carlos,
-        '2026-11-14T10:00:00',
-        '2026-11-16T12:00:00',
         N'Veículo com perda de potência e consumo elevado.',
-        'em_andamento'
+        'Em andamento',
+        '2026-11-14T10:00:00',
+        GETDATE()
     );
 
 COMMIT TRANSACTION;

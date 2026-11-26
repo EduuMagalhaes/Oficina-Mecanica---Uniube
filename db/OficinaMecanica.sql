@@ -65,13 +65,15 @@ GO
 -- ORDENS DE SERVIÇO
 CREATE TABLE ordens_servico (
     id INT IDENTITY(1,1) PRIMARY KEY,
+    cliente_id INT NOT NULL,
     veiculo_id INT NOT NULL,
     mecanico_id INT NOT NULL,
-    data_entrada DATETIME2(0) NOT NULL,
-    data_previsao_entrega DATETIME2(0) NOT NULL,
-    defeito_relatado NVARCHAR(MAX) NOT NULL,
-    status VARCHAR(30) NOT NULL,
+    defeito NVARCHAR(500) NOT NULL,
+    status NVARCHAR(20) NOT NULL DEFAULT 'Aberta',
+    data_entrada DATETIME NOT NULL,
+    data_abertura DATETIME NOT NULL DEFAULT GETDATE(),
 
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id),
     FOREIGN KEY (veiculo_id) REFERENCES veiculos(id),
     FOREIGN KEY (mecanico_id) REFERENCES mecanicos(id)
 );

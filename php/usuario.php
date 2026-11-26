@@ -46,3 +46,5 @@ try {
     error_log($erro->getMessage());
     responderJSON(false, 'Erro ao cadastrar o usuário.', 500);
 }
+
+?>

@@ -86,9 +86,9 @@ function validarPlaca(string $placa) {
 
 function validarDataNaoFutura(string $data) {
     $dataClean = trim($data);
-    
+
     date_default_timezone_set('America/Sao_Paulo');
-    
+
     $objData = DateTimeImmutable::createFromFormat('Y-m-d', $dataClean);
     $erros = DateTimeImmutable::getLastErrors();
 
@@ -102,11 +102,11 @@ function validarDataNaoFutura(string $data) {
 
     $hoje = new DateTimeImmutable('today');
 
-    if ($objData > $hoje) {
+    if ($objData->format('Y-m-d') > $hoje->format('Y-m-d')) {
         responderJSON(false, 'A data não pode ser futura.', 400);
     }
 
-    return $dataClean;
+    return $objData->format('Ymd H:i:s.v');
 }
 
 function validarNumeroNaoNegativo(string $valor) {    
@@ -202,14 +202,26 @@ function validarQuilometragem(string $quilometragem) {
     return (int) $quilometragemClean;
 }
 
-function validarClienteId(string $clienteId) {
-    $clienteIdClean = trim($clienteId);
+function validarId(string $id, string $campo) {
+    $idClean = trim($id);
 
-    if ($clienteIdClean === '') responderJSON(false, 'ID do cliente não informado.', 400);
+    if ($idClean === '') responderJSON(false, "$campo não informado.", 400);
 
-    if (!preg_match('/^\d+$/', $clienteIdClean)) responderJSON(false, 'ID do cliente inválido.', 400);
+    if (!preg_match('/^\d+$/', $idClean)) responderJSON(false, '$campo inválido.', 400);
 
-    return (int) $clienteIdClean;
+    return (int) $idClean;
+}
+
+function validarStatus(string $status) {
+    $statusClean = trim($status);
+
+    $statusPermitidos = ['Aberta', 'Em andamento', 'Aguardando peça', 'Finalizada'];
+
+    if (!in_array($statusClean, $statusPermitidos, true)) {
+        responderJSON(false, 'Status inválido.', 400);
+    }
+
+    return $statusClean;
 }
 
 ?>

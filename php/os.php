@@ -1,45 +1,58 @@
 <?php
-require_once "functions.php";
+require_once __DIR__ . '/functions.php';
 
-$erros = [];
+validarCamposTexto($_POST, ['cliente_id', 'veiculo_id', 'mecanico_id', 'entrada', 'defeito', 'status']);
 
-if (!isset($_POST["veiculo"]) || strlen($_POST["veiculo"]) < 3) {
-    $erros[] = "Informe um veículo válido.";
-}
-if (!isset($_POST["mecanico"]) || strlen($_POST["mecanico"]) < 3) {
-    $erros[] = "Informe um mecânico válido.";
-}
-if (!isset($_POST["entrada"]) || !$_POST["entrada"]) {
-    $erros[] = "Informe uma data de entrada válida.";
-}
-if (!isset($_POST["previsao"]) || !$_POST["previsao"]) {
-    $erros[] = "Informe uma previsão de entrega válida.";
-}
+$cliente_id = validarId($_POST['cliente_id'], 'ID do cliente');
+$veiculo_id = validarId($_POST['veiculo_id'], 'ID do veículo');
+$mecanico_id = validarId($_POST['mecanico_id'], 'ID do mecânico');
+$entrada = validarDataNaoFutura($_POST['entrada']);
+$defeito = trim($_POST['defeito']);
+$status = validarStatus($_POST['status']);
 
-if (!isset($_POST["defeito"]) || strlen($_POST["defeito"]) < 5) {
-    $erros[] = "Informe um defeito válido.";
-}
-if (!isset($_POST["status"]) || !in_array($_POST["status"], ["Aberta", "Em andamento", "Aguardando peça", "Concluída"])) {
-    $erros[] = "Informe um status válido.";
-}
+try {
+    require __DIR__ . '/../db/conexao.php';
 
-if ($erros) {
-    responderJSON(false, implode(" ", $erros));
+    $consulta = $conexao->prepare(
+    'SELECT id
+     FROM ordens_servico
+     WHERE veiculo_id = ?
+       AND status IN (?, ?, ?)'
+    );
+
+    $consulta->execute([
+        $veiculo_id,
+        'Aberta',
+        'Em andamento',
+        'Aguardando peça'
+    ]);
+
+    if ($consulta->fetch()) {
+        responderJSON(false, 'O veículo selecionado já possui uma ordem de serviço aberta.', 409);
+    }
+    
+    $cadastro = $conexao->prepare(
+        'INSERT INTO ordens_servico (cliente_id, veiculo_id, mecanico_id, defeito, status, data_entrada)
+         VALUES (?, ?, ?, ?, ?, ?)'
+    );
+
+    $cadastro->execute([
+        $cliente_id,
+        $veiculo_id,
+        $mecanico_id,
+        $defeito,
+        $status,
+        $entrada        
+    ]);
+
+    responderJSON(true, 'Ordem de serviço cadastrada com sucesso.', 201);
+
+} catch (Throwable $erro) {
+    responderJSON(
+        false,
+        'Erro: ' . $erro->getMessage(),
+        500
+    );
 }
-
-$objetoOS = [
-    "veiculo" => $_POST["veiculo"],
-    "mecanico" => $_POST["mecanico"],
-    "entrada" => $_POST["entrada"],
-    "previsao" => $_POST["previsao"],
-    "defeito" => $_POST["defeito"],
-    "status" => $_POST["status"]
-];
-
-if (existeNoBanco("os", $objetoOS)) {
-    responderJSON(false, "Já existe uma OS aberta para este veículo.");
-}
-
-responderJSON(true, "OS aberta com sucesso.");
 
 ?>

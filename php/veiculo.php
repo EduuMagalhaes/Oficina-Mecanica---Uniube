@@ -8,7 +8,7 @@ $marca = validarMarcaModelo($_POST['marca']);
 $modelo = validarMarcaModelo($_POST['modelo']);
 $ano = validarAnoVeiculo($_POST['ano']);
 $quilometragem = validarQuilometragem($_POST['quilometragem']);
-$clienteId = validarClienteId($_POST['cliente_id']);
+$clienteId = validarId($_POST['cliente_id'], 'ID do cliente');
 
 try {
     require __DIR__ . '/../db/conexao.php';
