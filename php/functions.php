@@ -224,4 +224,14 @@ function validarStatus(string $status) {
     return $statusClean;
 }
 
+function exigirLogin() {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    if (empty($_SESSION['usuario_id'])) {
+        responderJSON(false, 'Acesso não autorizado.', 401);
+    }
+}
+
 ?>

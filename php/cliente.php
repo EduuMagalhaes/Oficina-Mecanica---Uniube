@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/functions.php';
 
+exigirLogin();
+
 validarCamposTexto($_POST, ['nome', 'cpf', 'telefone', 'email', 'endereco']);
 
 $nome = validarNome($_POST['nome']);

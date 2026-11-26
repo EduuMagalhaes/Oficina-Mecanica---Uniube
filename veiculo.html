@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
+    <script src="js/auth.js" defer></script>
     <script src="js/veiculo.js" defer></script>
     <script src="js/api.js" defer></script>
     <title>Oficina Mecânica - Veículos</title>
@@ -23,13 +24,15 @@
             <li><a href="peca.html">Peças</a></li>
             <li><a href="os.html">Ordem de Serviço</a></li>
             <li><a href="usuario.html">Usuários</a></li>
+            <li><a href="#" onclick="sair()">Sair</a></li>
         </ul>
     </nav>
     <main>
         <h2>Cadastro de Veículo</h2>
         <form id="form-veiculo">
             <label for="placa">Placa:</label>
-            <input type="text" id="placa" name="placa" placeholder="ABC1D23 ou ABC1234" minlength="6" maxlength="7" required>
+            <input type="text" id="placa" name="placa" placeholder="ABC1D23 ou ABC1234" minlength="6" maxlength="7"
+                required>
 
             <label for="marca">Marca:</label>
             <input type="text" id="marca" name="marca" placeholder="Ex.: Fiat" required>

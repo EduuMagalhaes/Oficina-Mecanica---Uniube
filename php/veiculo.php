@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/functions.php';
 
+exigirLogin();
+
 validarCamposTexto($_POST, ['placa', 'marca', 'modelo', 'ano', 'quilometragem', 'cliente_id']);
 
 $placa = validarPlaca($_POST['placa']);

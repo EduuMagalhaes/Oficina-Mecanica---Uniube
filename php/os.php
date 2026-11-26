@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/functions.php';
 
+exigirLogin();
+
 validarCamposTexto($_POST, ['cliente_id', 'veiculo_id', 'mecanico_id', 'entrada', 'defeito', 'status']);
 
 $cliente_id = validarId($_POST['cliente_id'], 'ID do cliente');

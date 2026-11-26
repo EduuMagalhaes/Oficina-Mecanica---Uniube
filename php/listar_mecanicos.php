@@ -1,6 +1,8 @@
 <?php
 require __DIR__ . '/functions.php';
 
+exigirLogin();
+
 try {
     require __DIR__ . '/../db/conexao.php';
 
