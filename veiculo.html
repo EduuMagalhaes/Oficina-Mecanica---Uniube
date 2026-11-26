@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
     <script src="js/veiculo.js" defer></script>
+    <script src="js/api.js" defer></script>
     <title>Oficina Mecânica - Veículos</title>
 </head>
 
@@ -21,24 +22,49 @@
             <li><a href="mecanico.html">Mecânicos</a></li>
             <li><a href="peca.html">Peças</a></li>
             <li><a href="os.html">Ordem de Serviço</a></li>
+            <li><a href="usuario.html">Usuários</a></li>
         </ul>
     </nav>
     <main>
         <h2>Cadastro de Veículo</h2>
         <form id="form-veiculo">
             <label for="placa">Placa:</label>
-            <input type="text" id="placa" name="placa" placeholder="ABC1D23 ou ABC1234" maxlength="7" required>
+            <input type="text" id="placa" name="placa" placeholder="ABC1D23 ou ABC1234" minlength="6" maxlength="7" required>
+
             <label for="marca">Marca:</label>
             <input type="text" id="marca" name="marca" placeholder="Ex.: Fiat" required>
+
             <label for="modelo">Modelo:</label>
             <input type="text" id="modelo" name="modelo" placeholder="Ex.: Uno" required>
+
             <label for="ano">Ano:</label>
             <input type="number" id="ano" name="ano" min="1950" placeholder="Ex.: 2015" required>
+
             <label for="quilometragem">Quilometragem:</label>
             <input type="number" id="quilometragem" name="quilometragem" min="0" placeholder="Ex.: 85000" required>
-            <label for="cliente">Cliente (dono):</label>
-            <input type="text" id="cliente" name="cliente" placeholder="Nome do cliente" required>
-            <button type="button" onclick="botaoCadastrarVeiculo()">Cadastrar</button>
+
+            <!-- cliente -->
+            <label for="cliente_nome">Cliente:</label>
+
+            <div class="campo-cliente">
+                <input type="text" id="cliente_nome" placeholder="Nenhum cliente selecionado" readonly>
+                <button type="button" id="btn-selecionar-cliente">Selecionar</button>
+            </div>
+
+            <input type="hidden" id="cliente_id" name="cliente_id">
+
+            <div id="modal-cliente" class="modal">
+                <div class="modal-conteudo">
+                    <div class="modal-topo">
+                        <h3>Selecionar cliente</h3>
+                        <button type="button" id="btn-fechar-modal">&times;</button>
+                    </div>
+                    <input type="text" id="buscar-cliente" placeholder="Buscar pelo nome...">
+                    <div id="lista-clientes"></div>
+                </div>
+            </div>
+
+            <button id="btn-veiculo" type="submit">Cadastrar</button>
         </form>
         <div id="mensagem"></div>
         <a class="voltar" href="index.html">Voltar à página inicial</a>

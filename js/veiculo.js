@@ -1,37 +1,76 @@
-const ano = document.getElementById("ano");
-ano.max = new Date().getFullYear() + 1;
+const btnSelecionarCliente = document.getElementById('btn-selecionar-cliente');
+const modalCliente = document.getElementById('modal-cliente');
+const btnFecharModal = document.getElementById('btn-fechar-modal');
+const buscarCliente = document.getElementById('buscar-cliente');
+const listaClientes = document.getElementById('lista-clientes');
+const clienteId = document.getElementById('cliente_id');
+const clienteNome = document.getElementById('cliente_nome');
 
-const msg = document.getElementById("mensagem");
+let clientes = [];
 
-document.getElementById("placa").addEventListener("input", (e) => {
-    e.target.value = e.target.value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(0, 7);
-});
-
-function mostrarMensagem(texto, tipo) {
-    msg.textContent = texto;
-    msg.className = tipo;
-}
-
-async function botaoCadastrarVeiculo() {
-    const formulario = document.getElementById("form-veiculo");
-    const dados = new FormData(formulario);
-
+async function carregarClientes() {
     try {
-        const resposta = await fetch("php/veiculo.php", {
-            method: "POST",
-            body: dados
-        });
-
+        const resposta = await fetch('php/listar_clientes.php');
         const resultado = await resposta.json();
 
-        if (resultado.sucesso) {
-            mostrarMensagem(resultado.mensagem, "ok");
-            formulario.reset();
-        } else {
-            mostrarMensagem(resultado.mensagem, "erro");
+        if (!resultado.sucesso) {
+            console.error(resultado.mensagem);
+            return;
         }
+
+        clientes = resultado.clientes;
+        mostrarClientes('');
     } catch (erro) {
-        mostrarMensagem("Erro ao enviar os dados ao servidor.", "erro");
-        console.error(erro);
+        console.error('Erro ao carregar clientes:', erro);
     }
 }
+
+function mostrarClientes(texto) {
+    listaClientes.innerHTML = '';
+
+    const busca = texto.toLowerCase();
+
+    const filtrados = clientes.filter((cliente) => {
+        return cliente.nome.toLowerCase().includes(busca);
+    });
+
+    if (filtrados.length === 0) {
+        listaClientes.innerHTML = '<p class="cliente-item">Nenhum cliente encontrado.</p>';
+        return;
+    }
+
+    filtrados.forEach((cliente) => {
+        const item = document.createElement('div');
+        item.className = 'cliente-item';
+        item.textContent = cliente.nome;
+
+        item.addEventListener('click', () => {
+            clienteId.value = cliente.id;
+            clienteNome.value = cliente.nome;
+
+            fecharModal();
+        });
+
+        listaClientes.appendChild(item);
+    });
+}
+
+function abrirModal() {
+    modalCliente.classList.add('aberto');
+    buscarCliente.value = '';
+    mostrarClientes('');
+    buscarCliente.focus();
+}
+
+function fecharModal() {
+    modalCliente.classList.remove('aberto');
+}
+
+btnSelecionarCliente.addEventListener('click', abrirModal);
+btnFecharModal.addEventListener('click', fecharModal);
+
+buscarCliente.addEventListener('input', () => {
+    mostrarClientes(buscarCliente.value);
+});
+
+carregarClientes();
